@@ -7,8 +7,8 @@ services:
     ports:
       - "5434:5432"
     environment:
-      - POSTGRES_USER=preco
-      - POSTGRES_PASSWORD=preco_pg_passwd
+      - POSTGRES_USER=rails_template
+      - POSTGRES_PASSWORD=rails_template_pg_passwd
 
 volumes:
   postgresql:

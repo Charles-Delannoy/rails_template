@@ -12,14 +12,14 @@ default: &default
 
 development:
   <<: *default
-  database: preco_development
+  database: rails_template_development
 
 test:
   <<: *default
-  database: preco_test
+  database: rails_template_test
 
 production:
   <<: *default
-  database: preco_production
-  username: preco
-  password: <%= ENV["PRECO_DATABASE_PASSWORD"] %>
+  database: rails_template_production
+  username: rails_template
+  password: <%= ENV["rails_template_DATABASE_PASSWORD"] %>
