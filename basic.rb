@@ -81,7 +81,7 @@ after_bundle do
     run 'docker compose up -d'
     rails_command "db:drop db:create db:migrate"
 
-    generate("simple_form:install", "--bootstrap")
+    generate("simple_form:install")
     generate(:controller, "pages", "home", "--skip-routes", "--no-test-framework")
 end
 
