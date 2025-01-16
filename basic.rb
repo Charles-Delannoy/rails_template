@@ -56,7 +56,7 @@ inject_into_file "Gemfile", before: "group :development, :test do" do
 ########################################
 run "rm app/assets/stylesheets/application.css"
 run "rm -rf vendor"
-run "touch app/assets/stylesheets application.scss"
+run "touch app/assets/stylesheets/application.scss"
 
 
 # Use a structure.sql file
