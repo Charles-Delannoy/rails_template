@@ -33,6 +33,8 @@ File.write("config/database.yml", yaml_db_config)
 ########################################
 inject_into_file "Gemfile", before: "group :development, :test do" do
   <<~RUBY
+    gem "bootstrap", "~> 5.2"
+    gem "autoprefixer-rails"
     gem "font-awesome-sass", "~> 6.1"
     gem "simple_form", github: "heartcombo/simple_form"
     gem "sassc-rails"
@@ -54,9 +56,11 @@ inject_into_file "Gemfile", before: "group :development, :test do" do
 
 # Assets
 ########################################
-run "rm app/assets/stylesheets/application.css"
+run "rm -rf app/assets/stylesheets"
 run "rm -rf vendor"
-run "touch app/assets/stylesheets/application.scss"
+run "curl -L https://github.com/lewagon/rails-stylesheets/archive/master.zip > stylesheets.zip"
+run "unzip stylesheets.zip -d app/assets && rm -f stylesheets.zip && rm -f app/assets/rails-stylesheets-master/README.md"
+run "mv app/assets/rails-stylesheets-master app/assets/stylesheets"
 
 
 # Use a structure.sql file
@@ -77,20 +81,19 @@ gsub_file(
 )
 
 after_bundle do
-    run 'bundle exec vite install'
-    run 'docker compose up -d'
-    rails_command "db:drop db:create db:migrate"
+  run 'bundle exec vite install'
+  run 'docker compose up -d'
+  rails_command "db:drop db:create db:migrate"
+  generate("simple_form:install", "--bootstrap")
+  generate(:controller, "pages", "home", "--skip-routes", "--no-test-framework")
 
-    generate("simple_form:install")
-    generate(:controller, "pages", "home", "--skip-routes", "--no-test-framework")
-end
 
-# Routes
-########################################
+  # Routes
+  ########################################
   route 'root to: "pages#home"'
 
-# Gitignore
-########################################
+  # Gitignore
+  ########################################
   append_file ".gitignore", <<~TXT
 
     # Ignore .env file containing credentials.
@@ -100,6 +103,30 @@ end
     *.swp
     .DS_Store
   TXT
+
+  # Bootstrap & Popper
+  ########################################
+  append_file "config/importmap.rb", <<~RUBY
+    pin "bootstrap", to: "bootstrap.min.js", preload: true
+    pin "@popperjs/core", to: "popper.js", preload: true
+  RUBY
+
+  append_file "config/initializers/assets.rb", <<~RUBY
+    Rails.application.config.assets.precompile += %w(bootstrap.min.js popper.js)
+  RUBY
+
+  append_file "app/javascript/application.js", <<~JS
+    import "@popperjs/core"
+    import "bootstrap"
+  JS
+
+  append_file "app/assets/config/manifest.js", <<~JS
+    //= link popper.js
+    //= link bootstrap.min.js
+  JS
+
+  # Heroku
+  run "bundle lock --add-platform x86_64-linux"
 
   # Dotenv
   ########################################
@@ -114,3 +141,4 @@ end
   git :init
   git add: "."
   git commit: "-m 'Basic template from https://raw.githubusercontent.com/Charles-Delannoy/rails_template/main/basic.rb'"
+end
