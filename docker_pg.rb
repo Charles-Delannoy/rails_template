@@ -44,14 +44,7 @@ end
 
 inject_into_file "Gemfile", after: "group :development, :test do" do
   "\n  gem \"dotenv-rails\""
-end
-
-inject_into_file "Gemfile", before: "group :development, :test do" do
-  <<~RUBY
-    # build front with vite for rails
-    gem 'vite_rails'
-    gem 'dotenv-rails'
-  RUBY
+  "\n  gem \"vite_rails\""
 end
 
 # General Config
